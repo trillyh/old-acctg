@@ -1,3 +1,4 @@
+
 class JournalEntry:
 
   def __init__(self): 
@@ -5,7 +6,6 @@ class JournalEntry:
     self.cr = {"Nothing": 0}
     self.dr_amount = 0
     self.cr_amount = 0
-
 
   def debit(self, account, amount):
       assert isinstance(account, str), "Account must be a string"
@@ -29,6 +29,7 @@ class JournalEntry:
     if (dr_amount != cr_amount):
       print(f"Expecting Debit and Credit to equal \n Dr: {dr_amount}$ Credit: {cr_amount}$")
       return
+
     try:
       insert_to_db(self)
     except: 
@@ -37,5 +38,5 @@ class JournalEntry:
       print("Successfully finalized and inserted entry to database")
 
   def insert_to_db(self):
-      pass
-      
+      print("Inserting to databse")
+    
