@@ -1,65 +1,42 @@
-""" 
-Initialize tables if not exist.
+import sys
+import init_tables
+import login
+def main():
+    print("--- Welcome to ACTGen ---")
 
-Tables to be initialized:
-- User: Store users data
-- JournalEntry: Store the journal entries, but will not store the 
-  the effects of an entry to accounts. Instead JournalEntryAccount table will store these effects.
-- JournalEntryAccount: Store the effects of journal entries to accounts. (Debits, Credits and the amount)
+    isLoggedIn = False
+    while True:      
+        print("1. Login")
+        print("2. Create User")
+        print("3. Exit")
+        userInput = input("Enter option (1-3):  ")
+        
+        if not userInput.isdigit():
+            print("Please enter a number")
+        else:
+            userInput = int(userInput)
+
+            options = {
+                1: login.login,
+                2: login.create_user,
+                3: exit_program
+            }
+            option = options.get(userInput, None) # If invalid option ex: 4
+
+            if option:
+                option()
+            else: 
+                print("Invalid option entered")
+
+def exit_program():
+    print("Exiting the program.")
+    sys.exit()
+
 """
-import psycopg2
-
-connection = psycopg2.connect(host="localhost",
-                              dbname="postgres",
-                              user="postgres",
-                              password="8383")
-cur = connection.cursor()
-
-user_table_def = """ (
-  UserID SERIAL PRIMARY KEY,
-  Username VARCHAR(255) UNIQUE NOT NULL,
-  EMAIL VARCHAR(255) UNIQUE NOT NULL
-);
+Exit the program if this module is not being used as main
 """
-
-# Note: CreatedAt will not perform any timezone conversion
-journal_entry_def = """ (
-  EntryID SERIAL PRIMARY KEY,
-  UserID INTEGER NOT NULL,
-  TransactionDate DATE NOT NULL,
-  Description VARCHAR(255),
-  CreateAt TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
-  FOREIGN KEY (UserID) REFERENCES Users(UserID)
-);
-"""
-
-journal_entry_account_def =  """ (
-  EntryAccountID SERIAL PRIMARY KEY,
-  EntryID INTEGER NOT NULL,
-  Type VARCHAR(255) CHECK (Type IN ('Debit', 'Credit')),
-  Account VARCHAR(255) NOT NULL,
-  Amount DECIMAL(15, 2) NOT NULL CHECK(Amount >= 0),
-  FOREIGN KEY (EntryID) REFERENCES JournalEntry(EntryID)
-);
-"""
-
-tables_query = [
-    ("Users", user_table_def),
-    ("JournalEntry", journal_entry_def),
-    ("JournalEntryAccount", journal_entry_account_def)
-]
-
-try:
-   for table_name, table_definition in tables_query:
-     create_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} {table_definition} "
-     cur.execute(create_table_query)
-   connection.commit()
-   print("Tables created successfully")
-except psycopg2.Error as e:
-   print("An error occurred: ", e)
-   connection.rollback()  # Roll back the transaction on error
-
-
-
-cur.close()
-connection.close()
+if __name__ == "__main__":
+    main()
+else:
+    print("accounting.py should be used as main")
+    exit_program()
