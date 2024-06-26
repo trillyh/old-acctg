@@ -7,17 +7,16 @@ Tables to be initialized:
   the effects of an entry to accounts. Instead JournalEntryAccount table will store these effects.
 - JournalEntryAccount: Store the effects of journal entries to accounts. (Debits, Credits and the amount)
 """
+import utils
 import psycopg2
 
-connection = psycopg2.connect(host="localhost",
-                              dbname="postgres",
-                              user="postgres",
-                              password="8383")
+connection = utils.get_connection()
 cur = connection.cursor()
 
 user_table_def = """ (
   UserID SERIAL PRIMARY KEY,
   Username VARCHAR(255) UNIQUE NOT NULL,
+  Password VARCHAR(255) NOT NULL
   EMAIL VARCHAR(255) UNIQUE NOT NULL
 );
 """
