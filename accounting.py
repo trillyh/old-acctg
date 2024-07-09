@@ -40,3 +40,6 @@ if __name__ == "__main__":
 else:
     print("accounting.py should be used as main")
     exit_program()
+def takeInt(n: int):
+
+
