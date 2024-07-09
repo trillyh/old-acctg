@@ -1,4 +1,4 @@
-import utils
+import server_side.accounting.database_utils.utils as utils
 import psycopg2
 
 # Login function
