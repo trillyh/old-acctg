@@ -1,0 +1,37 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Playground - Net Accounting</title>
+		<link rel="stylesheet" href="{% static 'accounting/styles.css' %}">
+	</head>
+	<body>
+		<nav class="navbar">
+			<div class="navbar-brand">Net Accounting</div>
+			<ul class="navbar-menu">
+				<li><a href="../index.html#concepts">Concepts</a></li>
+				<li><a href="{% url 'about' %}">About</a></li>
+				<li><a href="{% url 'playground' %}">Playground</a></li>
+				<li><a href="login.html">Manage Business</a></li>
+			</ul>
+		</nav>
+		<div class="content">
+			<h1>Accounting Playground</h1>
+			<p>Use this playground to experiment with accounting rules and concepts without logging in.</p>
+			<div class="playground-form">
+				<form>
+					<label for="transaction">Enter Transaction:</label>
+					<input type="text" id="transaction" name="transaction" placeholder="e.g., Buy equipment for $1000" required>
+					<button type="submit">Analyze</button>
+				</form>
+			</div>
+			<div class="result">
+				<!-- This is where the analysis result will be displayed -->
+			</div>
+		</div>
+	</body>
+</html>
+
