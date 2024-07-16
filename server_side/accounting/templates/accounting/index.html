@@ -8,19 +8,10 @@
 		<link rel="stylesheet" href="{% static "accounting/styles.css" %}">
 	</head>
 	<body>
-		<nav class="navbar">
-			<div class="navbar-brand">Net Accounting</div>
-			<ul class="navbar-menu">
-				<li><a href="../index.html#concepts">Concepts</a></li>
-				<li><a href="{% url 'about' %}">About</a></li>
-				<li><a href="{% url 'playground' %}">Playground</a></li>
-				<li><a href="login.html">Manage Business</a></li>
-			</ul>
-		</nav>
-		<div class="content">
-			<h1>Net Accounting</h1>
-			<p>Use accounting concepts from ACCTG215 @ UW Foster to generate financial statement, statement of cash flow, and business analysis with charts. Strictly follow US GAAP rules.</p>
-			<button class="get-started" onclick="location.href='pages/playground.html'">Get Started</button>
-		</div>
+		{% include 'accounting/navbar.html' %}
+
+		{%block content%}
+
+		{%endblock%}
 	</body>
 </html>
