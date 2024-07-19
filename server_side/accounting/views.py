@@ -1,10 +1,11 @@
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import JournalEntry, User
+from django.contrib.auth.models import User
+from .models import JournalEntry
 from .utils import get_data_utils
 from .forms import JournalEntryForm
-# Create your views here.
+
 
 def show_about_page(request):
     return render(request, "accounting/about.html")
@@ -32,8 +33,7 @@ def show_playground_page(request):
         "form": form,
         "entries": entries,
         "user": user
-    }
- 
+    } 
     return render(request, "accounting/playground.html", context) 
 
 def show_concepts_page(request):
