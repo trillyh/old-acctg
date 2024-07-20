@@ -17,16 +17,11 @@ def show_playground_page(request):
     if request.method == 'POST':
         if 'add' in request.POST:
             form = JournalEntryForm(request.POST)
-            entry = form.save(commit=False)
-            entry.user = curr_user
-            entry.save()
-            print(f"User with ID {playground_id} added new entry")
+            handle_add_entry_form(form, curr_user)
             return redirect(show_playground_page)
         elif 'delete' in request.POST:
-            entry_id = request.POST.get("entry_id")
-            entry = get_object_or_404(JournalEntry, id=entry_id, user=curr_user)
-            entry.delete()
-            print(f"Entry {entry_id} deleted")
+            entry_id = request.POST.get("entry_id") 
+            handle_delete_entry_form(entry_id, curr_user)
             return redirect(show_playground_page)
 
 
@@ -58,5 +53,13 @@ def generate_financial_statement(request, business_id):
 """
 ------------- Utils function -------------
 """
+def handle_add_entry_form(form: JournalEntryForm, user):
+    entry = form.save(commit=False)
+    entry.user = user
+    entry.save()
+    print(f"User with ID {user.username} added new entry")
 
-
+def handle_delete_entry_form(entry_id, user):
+    entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
+    entry.delete()
+    print(f"Entry {entry_id} deleted")
