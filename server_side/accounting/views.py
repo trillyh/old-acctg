@@ -11,24 +11,25 @@ def show_about_page(request):
     return render(request, "accounting/about.html")
 
 def show_playground_page(request):
-    business_id = 2
-    user = get_object_or_404(User, id=business_id)
+    playground_id = 2
+    user = get_object_or_404(User, id=playground_id)
+    form = JournalEntryForm()
     if request.method == 'POST':
-        form = JournalEntryForm(request.POST)
-        if form.is_valid():
+        if 'add' in request.POST:
+            print(f"{request.POST.dict()}")
+            form = JournalEntryForm(request.POST)
             entry = form.save(commit=False)
-            entry.user = user
+            entry.user = User.objects.get(id=playground_id)
             entry.save()
-            return redirect('show_playground_page')
-    else:
-        form = JournalEntryForm()
-    
+            print(f"User with ID {playground_id} added new entry")
+            return redirect(show_playground_page)
+
+
     entries = None
     try:
-        entries = get_data_utils.get_entries(business_id)
+        entries = get_data_utils.get_entries(playground_id)
     except JournalEntry.DoesNotExist: 
         raise Http404("No entries")
-
     context = {
         "form": form,
         "entries": entries,
@@ -48,3 +49,9 @@ def show_entries(request, business_id):
     
 def generate_financial_statement(request, business_id): 
     return render(request, "accounting/playground.html")
+
+"""
+------------- Utils function -------------
+"""
+
+

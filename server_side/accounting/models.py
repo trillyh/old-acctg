@@ -16,7 +16,6 @@ class JournalEntry(models.Model):
     entry_date = models.DateTimeField()
     description = models.CharField(max_length=250)
     create_at = models.DateTimeField(auto_now_add=True)
-#    user = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.description} created at {self.create_at}"
 

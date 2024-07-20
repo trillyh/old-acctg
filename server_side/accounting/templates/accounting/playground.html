@@ -1,42 +1,55 @@
 {% extends 'accounting/index.html' %}
-{% block content %}
+	{% block content %}
 
 <div class="content">
 
-    <h1>Accounting Playground</h1>
-    <p>Use this playground to experiment with accounting rules and concepts without logging in.</p>
+	<h1>Accounting Playground</h1>
+	<p>Use this playground to experiment with accounting rules and concepts without logging in.</p>
 
-    <div class="playground-entries"> 
-        <h2>Entries</h2>
-        <form method="POST" class="entry-form">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Add entry</button> 
-        </form>
-        {% if entries %}
-        <table class="entries-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in entries %}
-                <tr>
-                    <td>{{ entry.entry_date}}</td>
-                    <td>{{ entry.description }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
-    </div>
+	<div class="playground-entries"> 
+		{% if entries %}
+		<table class="entries-table">
+			<form method="post" action="{% url 'playground' %}">
+				{% csrf_token %}
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Description</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						{% for field in form %}
+						<td>{{ field }}</td>
+						{% endfor %}
+						<td>
+							<button class="add-entry-button" type="submit" name="add">Add entry</button>
+						</td>
+					</tr>
 
-    <div class="playground-financial-statement"> 
+					{% for entry in entries %}
+					<tr>
+						<td>{{ entry.entry_date}}</td>
+						<td>{{ entry.description }}</td>
+						<td> 
+							<button class="edit-button" name="edit">Edit</button>
+							<button class="delete-button" name="delete">Delete</button>    
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</form>
+		</table>
+		{% endif %}
+	</div>
 
-    </div>
+	<div class="playground-financial-statement"> 
+
+	</div>
 </div>
 
 {% endblock content %}
+
+
 

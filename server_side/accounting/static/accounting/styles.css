@@ -77,7 +77,6 @@ body {
     background-color: #1b5e20;
 }
 
-
 form {
     display: inline-block;
     text-align: left;
@@ -110,7 +109,6 @@ button {
 button:hover {
     background-color: #1b5e20;
 }
-
 
 .playground-form {
     margin-bottom: 20px;
@@ -158,13 +156,12 @@ button:hover {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-	text-align: center;
 }
 
 .entries-table th, .entries-table td {
     padding: 10px;
     border: 1px solid #ccc;
-    text-align: center;
+    text-align: left;
 }
 
 .entries-table th {
@@ -175,10 +172,51 @@ button:hover {
     background-color: #f2f2f2;
 }
 
-.entries-table th:nth-child(1), .entries-table td:nth-child(1) {
+.entries-table th:first-child, .entries-table td:first-child {
     width: 150px; 
 }
 
+.entries-table th:nth-child(2), .entries-table td:nth-child(2) {
+    width: auto; 
+}
 
+.entries-table th:last-child, .entries-table td:last-child {
+    width: 150px;
+}
 
+.entries-table .add-entry-button, .entries-table .edit-button, .entries-table .delete-button {
+    margin: 2px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 70px;
+}
+
+.entries-table .add-entry-button {
+    background-color: #4f9253;
+    color: white;
+}
+
+.entries-table .add-entry-button:hover {
+    background-color: #1b5e20;
+}
+
+.entries-table .edit-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.entries-table .edit-button:hover {
+    background-color: #0056b3;
+}
+
+.entries-table .delete-button {
+    background-color: #d9534f;
+    color: white;
+}
+
+.entries-table .delete-button:hover {
+    background-color: #c9302c;
+}
 
