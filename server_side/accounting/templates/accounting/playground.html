@@ -9,37 +9,41 @@
 	<div class="playground-entries"> 
 		{% if entries %}
 		<table class="entries-table">
-			<form method="post" action="{% url 'playground' %}">
-				{% csrf_token %}
-				<thead>
-					<tr>
-						<th>Date</th>
-						<th>Description</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Description</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<form method="post" action="{% url 'playground' %}">
+						{% csrf_token %}
 						{% for field in form %}
 						<td>{{ field }}</td>
 						{% endfor %}
 						<td>
 							<button class="add-entry-button" type="submit" name="add">Add entry</button>
 						</td>
-					</tr>
+					</form>
+				</tr>
 
-					{% for entry in entries %}
-					<tr>
-						<td>{{ entry.entry_date}}</td>
-						<td>{{ entry.description }}</td>
-						<td> 
-							<button class="edit-button" name="edit">Edit</button>
+				{% for entry in entries %}
+				<tr>
+					<td>{{ entry.entry_date}}</td>
+					<td>{{ entry.description }}</td>
+					<td> 
+						<form method="post" action="{% url 'playground' %}" style="display:inline">
+							{% csrf_token %}
+							<input type="hidden" name="entry_id" value="{{ entry.id }}">
 							<button class="delete-button" name="delete">Delete</button>    
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</form>
+						</form>
+						<button class="edit-button" name="edit">Edit</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
 		</table>
 		{% endif %}
 	</div>

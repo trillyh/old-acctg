@@ -12,16 +12,21 @@ def show_about_page(request):
 
 def show_playground_page(request):
     playground_id = 2
-    user = get_object_or_404(User, id=playground_id)
+    curr_user = get_object_or_404(User, id=playground_id)
     form = JournalEntryForm()
     if request.method == 'POST':
         if 'add' in request.POST:
-            print(f"{request.POST.dict()}")
             form = JournalEntryForm(request.POST)
             entry = form.save(commit=False)
-            entry.user = User.objects.get(id=playground_id)
+            entry.user = curr_user
             entry.save()
             print(f"User with ID {playground_id} added new entry")
+            return redirect(show_playground_page)
+        elif 'delete' in request.POST:
+            entry_id = request.POST.get("entry_id")
+            entry = get_object_or_404(JournalEntry, id=entry_id, user=curr_user)
+            entry.delete()
+            print(f"Entry {entry_id} deleted")
             return redirect(show_playground_page)
 
 
@@ -33,7 +38,7 @@ def show_playground_page(request):
     context = {
         "form": form,
         "entries": entries,
-        "user": user
+        "user": curr_user 
     } 
     return render(request, "accounting/playground.html", context) 
 
