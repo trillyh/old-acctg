@@ -19,10 +19,17 @@ def show_playground_page(request):
             form = JournalEntryForm(request.POST)
             handle_add_entry_form(form, curr_user)
             return redirect(show_playground_page)
+
         elif 'delete' in request.POST:
             entry_id = request.POST.get("entry_id") 
             handle_delete_entry_form(entry_id, curr_user)
             return redirect(show_playground_page)
+
+        elif 'edit' in request.POST:
+            print(request.POST.dict())
+            pk = request.POST.get('entry_id')
+            form = handle_edit_entry_form(pk)
+
 
 
     entries = None
@@ -63,3 +70,7 @@ def handle_delete_entry_form(entry_id, user):
     entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
     entry.delete()
     print(f"Entry {entry_id} deleted")
+
+def handle_edit_entry_form(entry_id: int):
+    entry = JournalEntry.objects.get(id = entry_id)
+    return JournalEntryForm(instance=entry) 

@@ -19,7 +19,6 @@ class JournalEntry(models.Model):
     def __str__(self):
         return f"{self.description} created at {self.create_at}"
 
-
 """
 The details of an entry, indicates debit and credit of an entry.
   EntryAccountID SERIAL PRIMARY KEY,
