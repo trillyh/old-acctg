@@ -1,4 +1,6 @@
 from typing import Dict, Set
+from nltk import PorterStemmer
+from nltk.stem import porter
 
 account_keywords: Dict[str, Set[str]] = {
     "Food Expense": {"burger", "boba", "coffee", "lunch", "dinner", "meal", "snack", "drink", "restaurant"},
@@ -17,3 +19,8 @@ account_keywords: Dict[str, Set[str]] = {
     "Income": {"income", "revenue", "sales", "earned"}
 }
 
+stemmer = PorterStemmer()
+stemmed_account_keywords: Dict[str, Set[str]] = {
+    account: {stemmer.stem(word) for word in words}
+    for account, words in account_keywords.items()
+}

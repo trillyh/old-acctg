@@ -2,7 +2,7 @@ from operator import is_
 
 from nltk.featstruct import substitute_bindings
 from ..utils.nlp_utils.preprocessor import Preprocessor
-from .account_keywords import account_keywords
+from .account_keywords import stemmed_account_keywords
 from typing import List, Set
 
 class SubEntries:  
@@ -83,11 +83,11 @@ class SubEntries:
     For now, this function is only expect to return a single account (List of 1 element)
     """
     def get_account_involved(self, tokenized_description: List[str]) -> Set[str]:
-        assert account_keywords, "Account keywords dictionary is empty"
+        assert stemmed_account_keywords, "Account keywords dictionary is empty"
         account_involved: Set[str] = set()
 
         for word in tokenized_description:
-            for account, keyword in account_keywords.items():
+            for account, keyword in stemmed_account_keywords.items():
                 if word in keyword:
                     account_involved.add(account)
         
