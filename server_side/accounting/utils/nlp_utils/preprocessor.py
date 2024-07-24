@@ -1,9 +1,8 @@
-
 import nltk
 from typing import List
 import re
 import string
-from nltk.tokenize import TweetTokenizer
+from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
@@ -17,7 +16,8 @@ class Preprocessor:
 
         try:
             tokenized_words = self.tokenize(words)
-        except:
+        except Exception as e: 
+            print(e)
             print("Error occurred when tokenizing words")
             return [] # avoid unbound error
 
@@ -36,16 +36,16 @@ class Preprocessor:
         words = re.sub(r'#', '', words)
         return words
 
-    def tokenize(self, words: str) -> List[str]:
-        tokenizer = TweetTokenizer(preserve_case=False, strip_handles=True, reduce_len=True)
-        return tokenizer.tokenize(words)
+    def tokenize(self, words: str) -> List[str]: 
+        return word_tokenize(words)
         
     def remove_stopword_and_punctuation(self, tokenized_words: List[str]) -> List[str]:
         stopwords_english = set(stopwords.words("english"))
+        punctuation = set(string.punctuation) - {"$"} # Preserve the dollar $
         clean_words = []
         for word in tokenized_words:
             if (word not in stopwords_english
-                and word not in string.punctuation):
+                and word not in punctuation):
                 clean_words.append(word)
         return clean_words
 
@@ -58,11 +58,10 @@ class Preprocessor:
 Use for testing
 """
 if __name__ == "__main__":
-    nltk.download('stopwords')
     preprocessor = Preprocessor()
     
     # Test data
-    test_tweet = "RT This is a tweet! Check out https://example.com #hashtag"
+    test_tweet = "Bought 10$ of boba"
     test_tweets = [
         "RT This is a tweet! Check out https://example.com #hashtag",
         "Another tweet @user with more text. Visit https://example.com for more info!",
@@ -76,8 +75,8 @@ if __name__ == "__main__":
         "This is the last test tweet! https://test.com #end"
     ]
 
-    # Test single tweet
-    print("\nSingle Tweet Test:")
+    # Test dollar sign $
+    print("\nTest dollar sign $")
     cleaned_words = preprocessor.preprocess(test_tweet)
     print("All together:", cleaned_words)
 
@@ -85,3 +84,10 @@ if __name__ == "__main__":
     print("\nMultiple Tweets Test:")
     for i, tweet in enumerate(test_tweets):
         print(f"{i} {preprocessor.preprocess(tweet)}")
+
+"""
+Called in package's __init__.py
+"""
+def download_nltk_data():
+    nltk.download('stopwords')
+    nltk.download('punkt')
