@@ -6,7 +6,7 @@ from .account_keywords import stemmed_account_keywords
 from typing import List, Set
 
 class SubEntries:  
-    debit_liquid_related_keyword: Set[str] = {"received", "earned", "income", "deposit", "increase"}
+    debit_liquid_related_keyword: Set[str] = {"received", "earned", "income", "deposit", "increase", "sold", "sell"}
     credit_liquid_related_keyword: Set[str] = {"bought", "purchase", "paid", "expense", "withdraw", "decrease"}
     def __init__(self, entry_description):
         self.entry_description = entry_description

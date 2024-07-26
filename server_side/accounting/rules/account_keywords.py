@@ -4,7 +4,7 @@ from nltk.stem import porter
 
 account_keywords: Dict[str, Set[str]] = {
     "Food Expense": {"burger", "boba", "coffee", "lunch", "dinner", "meal", "snack", "drink", "restaurant"},
-    "Inventory": {"truck", "machine", "equipment", "tools", "supplies", "raw materials", "merchandise", "goods", "stock"},
+    "Inventory": {"truck", "machine", "tools", "supplies", "raw materials", "merchandise", "goods", "stock"},
     "Office Supplies": {"paper", "pen", "pencil", "notebook", "stapler", "envelope", "printer", "toner", "folder", "stationery"},
     "Travel Expense": {"flight", "hotel", "taxi", "uber", "train", "bus", "gas", "mileage", "ticket", "lodging"},
     "Utilities Expense": {"electricity", "water", "gas", "internet", "phone", "cable", "utility"},
@@ -16,7 +16,8 @@ account_keywords: Dict[str, Set[str]] = {
     "Interest Expense": {"interest", "loan", "mortgage"},
     "Salaries and Wages": {"salary", "wages", "payroll", "compensation", "earnings"},
     "Miscellaneous Expense": {"miscellaneous", "other"},
-    "Income": {"income", "revenue", "sales", "earned"}
+    "Income": {"income", "revenue", "sales", "earned"},
+    "Equipment": {"equipment"}
 }
 
 stemmer = PorterStemmer()
