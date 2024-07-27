@@ -1,20 +1,32 @@
-from operator import is_
+### Need to figure where to put these setting
+import django
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server_side.settings')
+django.setup()
 
+from operator import is_
 from nltk.featstruct import substitute_bindings
 from ..utils.nlp_utils.preprocessor import Preprocessor
 from .account_keywords import stemmed_account_keywords
-from typing import List, Set
+from ..models import JournalEntry, SubEntry
+from typing import List, Set, Optional
 
 class SubEntries:  
     debit_liquid_related_keyword: Set[str] = {"received", "earned", "income", "deposit", "increase", "sold", "sell"}
     credit_liquid_related_keyword: Set[str] = {"bought", "purchase", "paid", "expense", "withdraw", "decrease"}
-    def __init__(self, entry_description):
-        self.entry_description = entry_description
+    def __init__(self, journal_entry: Optional[JournalEntry] = None, entry_description: Optional[str] = None):
+        if journal_entry is not None:
+            self.journal_entry: Optional[JournalEntry] = journal_entry #Set Union[JournalEntry, None] to fix mypy complaining journal_entry type can't be None
+            self.entry_description =  journal_entry.description
+        if entry_description is not None:
+            self.journal_entry = None
+            self.entry_description = entry_description
+        else:
+            raise ValueError("Either journal_entry or entry_description must be provided")
         self.debit_amount = 0
         self.credit_amount = 0
         self.debit_account = ""
         self.credit_account = ""
-
 
     """
     For simplicity, NLP is not implemented yet, and simple algorithm will be use to analyze simple entries
@@ -30,7 +42,6 @@ class SubEntries:
         preprocessor = Preprocessor() 
         clean_tokenized_description: List[str] = []
         clean_tokenized_description = preprocessor.preprocess(self.entry_description)
-        print(clean_tokenized_description)
 
         is_on_account = self.check_is_on_account(clean_tokenized_description)
         is_debit_liquid_related = self.check_is_debit_liquid_asset(clean_tokenized_description)
@@ -38,10 +49,7 @@ class SubEntries:
         try:
             liquid_amount = self.get_liquid_amount(clean_tokenized_description)
         except Exception as e:
-            print("Indexing error occured when getting liquid amount")
-        
-        print(is_on_account)
-        print(is_debit_liquid_related)
+            print("Indexing error occured when getting liquid amount") 
    
         debited = False # If debited in the first part, then credit in second part
         
@@ -54,7 +62,6 @@ class SubEntries:
             debited = False
         
         account_involved = self.get_account_involved(clean_tokenized_description)
-        print(account_involved)
         # Analyze the second part of the journal entry
         if debited: # Second part will be credit
             self.credit_account = account_involved.pop()
@@ -96,8 +103,23 @@ class SubEntries:
         return account_involved
 
     def save_to_db(self):
-        pass
-
+        if self.journal_entry == None:
+            playground_user_id = 2
+            self.journal_entry = JournalEntry.objects.filter(user_id=playground_user_id).first()
+        # Test cases with JournalEntry being None, could raise error
+        debit_entry = SubEntry(
+            journal_entry=self.journal_entry,
+            sub_entry_type='Debit',
+            account = self.debit_account,
+            amount = self.debit_amount)
+        credit_entry = SubEntry(
+            journal_entry=self.journal_entry,
+            sub_entry_type='Debit',
+            account = self.credit_account,
+            amount = self.credit_amount)
+        debit_entry.save()
+        credit_entry.save()
+        
     """
     For testing
     """
@@ -117,9 +139,17 @@ if __name__ == "__main__":
     
     for entry_description in test_cases:
         print(f"Test case: {entry_description}")
-        subentries = SubEntries(entry_description)
+        subentries = SubEntries(entry_description=entry_description)
         subentries.analyze()
-        print(f"Debit ${subentries.debit_amount} to {subentries.debit_account}")
-        print(f"Credit ${subentries.credit_amount} to {subentries.credit_account}")
+#        print(f"Debit ${subentries.debit_amount} to {subentries.debit_account}")
+#        print(f"Credit ${subentries.credit_amount} to {subentries.credit_account}")
         print("\n" + "-"*38 + "\n")
 
+    """
+    Testing save to database
+    """
+    subentry = SubEntries(entry_description=test_cases[0])
+    subentry.analyze()
+    print(f"Debit ${subentry.debit_amount} to {subentry.debit_account}")
+    print(f"Credit ${subentry.credit_amount} to {subentry.credit_account}")
+    subentry.save_to_db()

@@ -5,7 +5,11 @@ from django.contrib.auth.models import User
 from .models import JournalEntry
 from .utils import get_data_utils
 from .forms import JournalEntryForm
+from .rules import subentries
 
+"""
+--- All views endpoint ---
+"""
 
 def show_about_page(request):
     return render(request, "accounting/about.html")
@@ -66,6 +70,8 @@ def handle_add_entry_form(form: JournalEntryForm, user):
     entry.save()
     print(f"User with ID {user.username} added new entry")
 
+
+
 def handle_delete_entry_form(entry_id, user):
     entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
     entry.delete()
@@ -74,3 +80,4 @@ def handle_delete_entry_form(entry_id, user):
 def handle_edit_entry_form(entry_id: int):
     entry = JournalEntry.objects.get(id = entry_id)
     return JournalEntryForm(instance=entry) 
+
