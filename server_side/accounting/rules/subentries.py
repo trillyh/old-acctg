@@ -14,11 +14,12 @@ from typing import List, Set, Optional
 class SubEntries:  
     debit_liquid_related_keyword: Set[str] = {"received", "earned", "income", "deposit", "increase", "sold", "sell"}
     credit_liquid_related_keyword: Set[str] = {"bought", "purchase", "paid", "expense", "withdraw", "decrease"}
+
     def __init__(self, journal_entry: Optional[JournalEntry] = None, entry_description: Optional[str] = None):
         if journal_entry is not None:
             self.journal_entry: Optional[JournalEntry] = journal_entry #Set Union[JournalEntry, None] to fix mypy complaining journal_entry type can't be None
             self.entry_description =  journal_entry.description
-        if entry_description is not None:
+        elif entry_description is not None:
             self.journal_entry = None
             self.entry_description = entry_description
         else:
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     """
     Testing save to database
     """
-    subentry = SubEntries(entry_description=test_cases[0])
+    subentry = SubEntries(JournalEntry.objects.filter(user_id=2).first())
     subentry.analyze()
     print(f"Debit ${subentry.debit_amount} to {subentry.debit_account}")
     print(f"Credit ${subentry.credit_amount} to {subentry.credit_account}")

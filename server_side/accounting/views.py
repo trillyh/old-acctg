@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .models import JournalEntry
 from .utils import get_data_utils
 from .forms import JournalEntryForm
-from .rules import subentries
+from .rules.subentries import SubEntries
 
 """
 --- All views endpoint ---
@@ -33,8 +33,6 @@ def show_playground_page(request):
             print(request.POST.dict())
             pk = request.POST.get('entry_id')
             form = handle_edit_entry_form(pk)
-
-
 
     entries = None
     try:
@@ -65,12 +63,21 @@ def generate_financial_statement(request, business_id):
 ------------- Utils function -------------
 """
 def handle_add_entry_form(form: JournalEntryForm, user):
-    entry = form.save(commit=False)
-    entry.user = user
-    entry.save()
-    print(f"User with ID {user.username} added new entry")
-
-
+    if form.is_valid():
+        entry = form.save(commit=False)
+        entry.user = user
+        entry.save()
+        print(f"User with ID {user.username} added new entry")
+        
+        print(type(JournalEntry.objects.filter(user_id=2).first()))
+        print(type(entry))
+        subentries = SubEntries(journal_entry=entry)
+        subentries.analyze()
+        subentries.save_to_db()
+        print("Two subentries saved")
+    else:
+        print("Form is not valid")
+        print(form.errors)
 
 def handle_delete_entry_form(entry_id, user):
     entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
