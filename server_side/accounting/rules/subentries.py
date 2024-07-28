@@ -149,7 +149,7 @@ if __name__ == "__main__":
     """
     Testing save to database
     """
-    subentry = SubEntries(JournalEntry.objects.filter(user_id=2).first())
+    subentry = SubEntries(entry_description=test_cases[0])
     subentry.analyze()
     print(f"Debit ${subentry.debit_amount} to {subentry.debit_account}")
     print(f"Credit ${subentry.credit_amount} to {subentry.credit_account}")

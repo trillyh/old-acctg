@@ -60,29 +60,28 @@ def generate_financial_statement(request, business_id):
     return render(request, "accounting/playground.html")
 
 """
-------------- Utils function -------------
+------------- Helper functions -------------
 """
 def handle_add_entry_form(form: JournalEntryForm, user):
     if form.is_valid():
-        entry = form.save(commit=False)
-        entry.user = user
-        entry.save()
+        journal_entry = form.save(commit=False)
+        journal_entry.user = user
+        journal_entry.save()
         print(f"User with ID {user.username} added new entry")
         
         print(type(JournalEntry.objects.filter(user_id=2).first()))
-        print(type(entry))
-        subentries = SubEntries(journal_entry=entry)
+        subentries = SubEntries(journal_entry=journal_entry)
         subentries.analyze()
         subentries.save_to_db()
-        print("Two subentries saved")
+        print(f"Subentries added for JournalEntry ID {journal_entry.id}")
     else:
         print("Form is not valid")
         print(form.errors)
 
 def handle_delete_entry_form(entry_id, user):
-    entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
-    entry.delete()
-    print(f"Entry {entry_id} deleted")
+        entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
+        entry.delete()
+        print(f"Entry {entry_id} deleted")
 
 def handle_edit_entry_form(entry_id: int):
     entry = JournalEntry.objects.get(id = entry_id)
