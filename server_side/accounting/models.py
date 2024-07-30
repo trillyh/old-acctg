@@ -30,6 +30,7 @@ The details of an entry, indicates debit and credit of an entry.
 """
 
 class SubEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     DEBIT = 'Debit'
     CREDIT = 'Credit'
     TYPE_CHOICES = [

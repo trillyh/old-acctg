@@ -10,20 +10,26 @@ from ..utils.nlp_utils.preprocessor import Preprocessor
 from .account_keywords import stemmed_account_keywords
 from ..models import JournalEntry, SubEntry
 from typing import List, Set, Optional
+from django.contrib.auth.models import User
 
 class SubEntries:  
     debit_liquid_related_keyword: Set[str] = {"received", "earned", "income", "deposit", "increase", "sold", "sell"}
     credit_liquid_related_keyword: Set[str] = {"bought", "purchase", "paid", "expense", "withdraw", "decrease"}
 
     def __init__(self, journal_entry: Optional[JournalEntry] = None, entry_description: Optional[str] = None):
+        
         if journal_entry is not None:
             self.journal_entry: Optional[JournalEntry] = journal_entry #Set Union[JournalEntry, None] to fix mypy complaining journal_entry type can't be None
             self.entry_description =  journal_entry.description
         elif entry_description is not None:
-            self.journal_entry = None
+            playground_user_id = 2
+            self.journal_entry = JournalEntry.objects.filter(user_id=playground_user_id).first()
             self.entry_description = entry_description
         else:
             raise ValueError("Either journal_entry or entry_description must be provided")
+
+        assert self.journal_entry is not None, "Journal Entry is none"
+        self.user: Optional[User] = self.journal_entry.user
         self.debit_amount = 0
         self.credit_amount = 0
         self.debit_account = ""
@@ -104,18 +110,17 @@ class SubEntries:
         return account_involved
 
     def save_to_db(self):
-        if self.journal_entry == None:
-            playground_user_id = 2
-            self.journal_entry = JournalEntry.objects.filter(user_id=playground_user_id).first()
         # Test cases with JournalEntry being None, could raise error
         debit_entry = SubEntry(
+            user=self.user,
             journal_entry=self.journal_entry,
             sub_entry_type='Debit',
             account = self.debit_account,
             amount = self.debit_amount)
         credit_entry = SubEntry(
+            user=self.user,
             journal_entry=self.journal_entry,
-            sub_entry_type='Debit',
+            sub_entry_type='Credit',
             account = self.credit_account,
             amount = self.credit_amount)
         debit_entry.save()
@@ -142,8 +147,8 @@ if __name__ == "__main__":
         print(f"Test case: {entry_description}")
         subentries = SubEntries(entry_description=entry_description)
         subentries.analyze()
-#        print(f"Debit ${subentries.debit_amount} to {subentries.debit_account}")
-#        print(f"Credit ${subentries.credit_amount} to {subentries.credit_account}")
+        print(f"Debit ${subentries.debit_amount} to {subentries.debit_account}")
+        print(f"Credit ${subentries.credit_amount} to {subentries.credit_account}")
         print("\n" + "-"*38 + "\n")
 
     """
@@ -153,4 +158,3 @@ if __name__ == "__main__":
     subentry.analyze()
     print(f"Debit ${subentry.debit_amount} to {subentry.debit_account}")
     print(f"Credit ${subentry.credit_amount} to {subentry.credit_account}")
-    subentry.save_to_db()

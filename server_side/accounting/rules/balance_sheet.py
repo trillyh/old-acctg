@@ -1,6 +1,8 @@
+from ..models import SubEntry
+from typing import List
 class BalanceSheet():
-    
-    def __init__(self, date=""):
+    def __init__(self, business_id: int, date=""):
+        self.business_id = business_id 
         self.date = date
         self.balance_sheet = {    
             "Assets": {
@@ -46,3 +48,11 @@ class BalanceSheet():
             }
         }
 
+    def generate(self):
+        print("getting")
+        sub_entries = SubEntry.objects.filter(user_id=self.business_id)
+        print(sub_entries)
+        assert sub_entries is not None, "Is empty"
+
+        for subentry in sub_entries:
+            print(subentry)

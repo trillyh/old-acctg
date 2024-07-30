@@ -41,8 +41,7 @@ def show_playground_page(request):
         entries = get_data_utils.get_entries(playground_id)
     except JournalEntry.DoesNotExist: 
         raise Http404("No entries")
-
-    balance_sheet = BalanceSheet("07-30-2024")
+    balance_sheet = get_and_analyze_balance_sheet(business_id=playground_id)
     context = {
         "form": form,
         "entries": entries,
@@ -92,5 +91,7 @@ def handle_edit_entry_form(entry_id: int):
     entry = JournalEntry.objects.get(id = entry_id)
     return JournalEntryForm(instance=entry) 
 
-def show_financial_statement():
-    pass
+def get_and_analyze_balance_sheet(business_id) -> BalanceSheet: 
+    balance_sheet = BalanceSheet(business_id=business_id, date="07-30-2024")
+    balance_sheet.generate()
+    return balance_sheet 
