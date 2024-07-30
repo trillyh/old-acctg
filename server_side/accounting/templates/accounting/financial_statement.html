@@ -1,0 +1,51 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Financial Statement</title>
+		<link rel="stylesheet" href="{% static "accounting/financial_statement.css"%}">
+	</head>
+	<body>
+		<div class="financial-statement">
+			<h1>Balance Sheet</h1>
+			<h2>Playground</h2>
+			<p>Date: {{ balance_sheet.date}} </p>
+
+			<div class="section">
+				<h3>Assets</h3>
+				{% for group, accounts in balance_sheet.balance_sheet.Assets.items %}
+				<h4>{{ group }}</h4>
+				<ul>
+					{% for account, amount in accounts.items %}
+					<li>{{ account }}: ${{ amount }}</li>
+					{% endfor %}
+				</ul>
+				{% endfor %}
+
+				<div class="section">
+					<h3>Liabilities</h3>
+					{% for group, accounts in balance_sheet.balance_sheet.Liabilities.items %}
+					<h4>{{ group }}</h4>
+					<ul>
+						{% for account, amount in accounts.items %}
+						<li>{{ account }}: ${{ amount }}</li>
+						{% endfor %}
+					</ul>
+					{% endfor %}
+				</div>
+				<div class="section"> 
+					<h3> Stockholders' Equity</h3>
+					{% for account, amount in balance_sheet.balance_sheet.Equities.items %}
+					<ul>
+						<li>{{ account }}: ${{ amount }}</li>
+					</ul>
+					{% endfor %}
+				</div>
+
+			</div>
+		</div>
+	</body>
+</html>
+

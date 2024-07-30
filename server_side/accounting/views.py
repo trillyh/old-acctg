@@ -6,6 +6,7 @@ from .models import JournalEntry
 from .utils import get_data_utils
 from .forms import JournalEntryForm
 from .rules.subentries import SubEntries
+from .rules.balance_sheet import BalanceSheet
 
 """
 --- All views endpoint ---
@@ -17,6 +18,7 @@ def show_about_page(request):
 def show_playground_page(request):
     playground_id = 2
     curr_user = get_object_or_404(User, id=playground_id)
+
     form = JournalEntryForm()
     if request.method == 'POST':
         if 'add' in request.POST:
@@ -39,10 +41,13 @@ def show_playground_page(request):
         entries = get_data_utils.get_entries(playground_id)
     except JournalEntry.DoesNotExist: 
         raise Http404("No entries")
+
+    balance_sheet = BalanceSheet("07-30-2024")
     context = {
         "form": form,
         "entries": entries,
-        "user": curr_user 
+        "user": curr_user,
+        "balance_sheet": balance_sheet
     } 
     return render(request, "accounting/playground.html", context) 
 
@@ -87,3 +92,5 @@ def handle_edit_entry_form(entry_id: int):
     entry = JournalEntry.objects.get(id = entry_id)
     return JournalEntryForm(instance=entry) 
 
+def show_financial_statement():
+    pass
