@@ -1,10 +1,10 @@
 from ..models import SubEntry
-from typing import List
+from typing import List, Dict, Set, Union
 class BalanceSheet():
     def __init__(self, business_id: int, date=""):
         self.business_id = business_id 
         self.date = date
-        self.balance_sheet = {    
+        self.balance_sheet = {
             "Assets": {
                 "Current assets": {
                     "Cash and cash equivalents": 0,
@@ -47,7 +47,14 @@ class BalanceSheet():
                 "Accumulated other comprehensive income": 0
             }
         }
+        # We prob don't need these sets... I just created them for fun and to learn Set comprehension
+        self.assets_keyword = {account for account, asset_group in self.balance_sheet["Assets"].items() for account in asset_group}
+        self.liabilities_keyword = {account for account, liability_group in self.balance_sheet["Liabilities"].items() for account in liability_group}
+        self.equities_keyword = {account for account in self.balance_sheet["Equities"].keys()}
 
+
+        print(self.assets_keyword)
+        print(self.equities_keyword)
     def generate(self):
         print("getting")
         sub_entries = SubEntry.objects.filter(user_id=self.business_id)
@@ -55,4 +62,14 @@ class BalanceSheet():
         assert sub_entries is not None, "Is empty"
 
         for subentry in sub_entries:
-            print(subentry)
+            isDebit = subentry.sub_entry_type == "Debit"
+            account = subentry.account
+            
+            if account == "Account receivable" and isDebit:
+                self.balance_sheet["Assets"]["Current assets"]["Notes and Accounts receivable"] += subentry.amount
+
+            elif account == "Cash" and isDebit:
+                self.balance_sheet["Assets"]["Current assets"]["Cash and cash equivalents"] += subentry.amount
+
+
+
