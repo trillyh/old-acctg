@@ -52,11 +52,40 @@ class BalanceSheet():
         self.liabilities_keyword = {account for account, liability_group in self.balance_sheet["Liabilities"].items() for account in liability_group}
         self.equities_keyword = {account for account in self.balance_sheet["Equities"].keys()}
 
+        self.account_to_balance_sheet_mapping = {
+            "Account receivable": ("Assets", "Current assets", "Notes and Accounts receivable"),
+            "Cash": ("Assets", "Current assets", "Cash and cash equivalents"),
+            "Inventory": ("Assets", "Current assets", "Inventories"),
+            "Prepaid expenses": ("Assets", "Current assets", "Prepaid expenses"),
+            "Other current assets": ("Assets", "Current assets", "Other current assets"),
+            "Investments": ("Assets", "Non-current assets", "Investments, advances and long-term receivables"),
+            "Property": ("Assets", "Non-current assets", "Property"),
+            "Equipment": ("Assets", "Non-current assets", "Equipment"),
+            "Intangibles": ("Assets", "Non-current assets", "Intangibles"),
+            "Other non-current assets": ("Assets", "Non-current assets", "Other non-current assets"),
+            "Accounts payable": ("Liabilities", "Current liabilities", "Accounts payable"),
+            "Notes payable": ("Liabilities", "Current liabilities", "Notes payable"),
+            "Income taxes payable": ("Liabilities", "Current liabilities", "Income taxes payable"),
+            "Dividends payable": ("Liabilities", "Current liabilities", "Dividends payable"),
+            "Accrued expenses": ("Liabilities", "Current liabilities", "Accrued expenses"),
+            "Deferred revenues": ("Liabilities", "Current liabilities", "Deferred revenues"),
+            "Other current liabilities": ("Liabilities", "Current liabilities", "Other current liabilities"),
+            "Long-term debt": ("Liabilities", "Non-current liabilities", "Long-term debt"),
+            "Deferred tax liabilities": ("Liabilities", "Non-current liabilities", "Deferred tax liabilities"),
+            "Other non-current liabilities": ("Liabilities", "Non-current liabilities", "Other non-current liabilities"),
+            "Common stock": ("Equities", "Common stock"),
+            "Common stock without par value": ("Equities", "Common stock without par value"),
+            "Common stock held in treasury": ("Equities", "Common stock held in treasury"),
+            "Preferred stock": ("Equities", "Preferred stock"),
+            "Additional paid-in capital": ("Equities", "Additional paid-in capital"),
+            "Retained earnings": ("Equities", "Retained earnings"),
+            "Accumulated other comprehensive income": ("Equities", "Accumulated other comprehensive income")
+        }
 
         print(self.assets_keyword)
         print(self.equities_keyword)
+
     def generate(self):
-        print("getting")
         sub_entries = SubEntry.objects.filter(user_id=self.business_id)
         print(sub_entries)
         assert sub_entries is not None, "Is empty"
@@ -64,12 +93,24 @@ class BalanceSheet():
         for subentry in sub_entries:
             isDebit = subentry.sub_entry_type == "Debit"
             account = subentry.account
-            
-            if account == "Account receivable" and isDebit:
-                self.balance_sheet["Assets"]["Current assets"]["Notes and Accounts receivable"] += subentry.amount
 
-            elif account == "Cash" and isDebit:
-                self.balance_sheet["Assets"]["Current assets"]["Cash and cash equivalents"] += subentry.amount
+            if account in self.account_to_balance_sheet_mapping:
 
+                if len(self.account_to_balance_sheet_mapping[account]) == 3:
+                    section, group, item = self.account_to_balance_sheet_mapping[account]
+                else: # Equities just section and items, no group
+                    section, group, item = (self.account_to_balance_sheet_mapping[account][0], None, self.account_to_balance_sheet_mapping[account][1]) 
 
+                isEquities = group == None
+
+                if isEquities:
+                    if isDebit:
+                        self.balance_sheet[section][item] += subentry.amount
+                    else:
+                        self.balance_sheet[section][item] -= subentry.amount
+                else:
+                    if isDebit:
+                        self.balance_sheet[section][group][item] += subentry.amount if isDebit else ((-1) * subentry.amount)
+                    else:
+                        self.balance_sheet[section][group][item] -= subentry.amount
 

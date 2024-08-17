@@ -21,10 +21,12 @@ class SubEntries:
         if journal_entry is not None:
             self.journal_entry: Optional[JournalEntry] = journal_entry #Set Union[JournalEntry, None] to fix mypy complaining journal_entry type can't be None
             self.entry_description =  journal_entry.description
+
         elif entry_description is not None:
             playground_user_id = 2
             self.journal_entry = JournalEntry.objects.filter(user_id=playground_user_id).first()
             self.entry_description = entry_description
+
         else:
             raise ValueError("Either journal_entry or entry_description must be provided")
 
@@ -52,6 +54,7 @@ class SubEntries:
 
         is_on_account = self.check_is_on_account(clean_tokenized_description)
         is_debit_liquid_related = self.check_is_debit_liquid_asset(clean_tokenized_description)
+
         liquid_amount = 0 
         try:
             liquid_amount = self.get_liquid_amount(clean_tokenized_description)
@@ -64,11 +67,12 @@ class SubEntries:
         if is_debit_liquid_related:
             self.debit_account = "Account Receivable" if is_on_account else "Cash"
             debited = True 
+
         else:
             self.credit_account = "Account Payable" if is_on_account else "Cash"
             debited = False
         
-        account_involved = self.get_account_involved(clean_tokenized_description)
+        account_involved: Set[str] = self.get_account_involved(clean_tokenized_description)
         # Analyze the second part of the journal entry
         if debited: # Second part will be credit
             self.credit_account = account_involved.pop()

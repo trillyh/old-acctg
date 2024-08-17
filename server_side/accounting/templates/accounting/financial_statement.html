@@ -36,7 +36,7 @@
 					{% endfor %}
 				</div>
 				<div class="section"> 
-					<h3> Stockholders' Equity</h3>
+					<h3>Stockholders' Equity</h3>
 					{% for account, amount in balance_sheet.balance_sheet.Equities.items %}
 					<ul>
 						<li>{{ account }}: ${{ amount }}</li>
