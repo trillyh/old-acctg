@@ -82,12 +82,8 @@ class BalanceSheet():
             "Accumulated other comprehensive income": ("Equities", "Accumulated other comprehensive income")
         }
 
-        print(self.assets_keyword)
-        print(self.equities_keyword)
-
     def generate(self):
         sub_entries = SubEntry.objects.filter(user_id=self.business_id)
-        print(sub_entries)
         assert sub_entries is not None, "Is empty"
 
         for subentry in sub_entries:

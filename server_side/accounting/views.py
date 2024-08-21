@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from .models import JournalEntry
-from .utils import get_data_utils
+from .models import SubEntry
 from .forms import JournalEntryForm
 from .rules.subentries import SubEntries
 from .rules.balance_sheet import BalanceSheet
@@ -11,10 +11,14 @@ from .rules.balance_sheet import BalanceSheet
 """
 --- All views endpoint ---
 """
-
 def show_about_page(request):
     return render(request, "accounting/about.html")
 
+"""
+1. Handle add, delete and edit forms of entries
+2. Get all entries and pass them to context
+3. Get balance sheet and pass them to context
+"""
 def show_playground_page(request):
     playground_id = 2
     curr_user = get_object_or_404(User, id=playground_id)
@@ -38,16 +42,23 @@ def show_playground_page(request):
 
     entries = None
     try:
-        entries = get_data_utils.get_entries(playground_id)
+        entries = get_entries(playground_id)
     except JournalEntry.DoesNotExist: 
         raise Http404("No entries")
+
+    entry_subentries = {}
+    for entry in entries:
+        subentries = entry.subentry_set.all()
+        entry_subentries[entry.id] = subentries
     balance_sheet = get_and_analyze_balance_sheet(business_id=playground_id)
     context = {
         "form": form,
         "entries": entries,
+        "entry_subentries": entry_subentries,
         "user": curr_user,
         "balance_sheet": balance_sheet
     } 
+    print(entry_subentries)
     return render(request, "accounting/playground.html", context) 
 
 def show_concepts_page(request):
@@ -95,3 +106,10 @@ def get_and_analyze_balance_sheet(business_id) -> BalanceSheet:
     balance_sheet = BalanceSheet(business_id=business_id, date="07-30-2024")
     balance_sheet.generate()
     return balance_sheet 
+
+"""
+Return all journal entries from a business base on business's ID
+"""
+def get_entries(business_id: int):
+    entries = JournalEntry.objects.filter(user_id=business_id).order_by("-entry_date")
+    return entries

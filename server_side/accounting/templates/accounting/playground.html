@@ -1,5 +1,6 @@
 
 {% extends 'accounting/index.html' %}
+{% load dict_tags %}
 {% block content %}
 
 <div class="content">
@@ -17,6 +18,8 @@
                 </tr>
             </thead>
             <tbody>
+
+                <!-- Add new journal entry, if no form is currently in "editing mode" -->
                 {% if not form.instance.id %}
                 <tr>
                     <form method="post" action="{% url 'playground' %}">
@@ -31,8 +34,10 @@
                 </tr>
                 {% endif %}
 
+                <!-- Show all entries as rows -->
                 {% for entry in entries %}
                 <tr>
+                    <!-- Editing mode-->
                     {% if form.instance.id == entry.id %}
                     <form method="post" action="{% url 'playground' %}">
                         {% csrf_token %}
@@ -47,6 +52,7 @@
                         </td>
                     </form>
                     {% else %}
+                    <!-- If not in editing mode, just show entry date and description, button for edit and delete -->
                     <td>{{ entry.entry_date }}</td>
                     <td>{{ entry.description }}</td>
                     <td>
@@ -63,7 +69,17 @@
                     </td>
                     {% endif %}
                 </tr>
+                <tr>
+                    <td colspan="3">
+                        {% with subentries=entry_subentries|get_item:entry.id %}
+                            {% for subentry in subentries %}
+                                <p>{{ subentry }}</p> 
+                            {% endfor %}
+                        {% endwith %}
+                    </td>
+                </tr>
                 {% endfor %}
+
             </tbody>
         </table>
         {% endif %}
