@@ -38,7 +38,6 @@ def show_playground_page(request):
             return redirect(show_playground_page)
 
         elif 'edit' in request.POST:
-            print(request.POST.dict())
             entry_id = request.POST.get('entry_id')
             editing_entry = get_object_or_404(JournalEntry, id=entry_id)
             form = JournalEntryForm(instance=editing_entry)
@@ -46,8 +45,6 @@ def show_playground_page(request):
         elif 'save' in request.POST:
             entry_id = request.POST.get('entry_id') 
             editing_entry = get_object_or_404(JournalEntry, id=entry_id)
-            print(f"form received {request.POST}")
-            print(f"The editing entry is {editing_entry}")
             form = JournalEntryForm(request.POST, instance=editing_entry)
             if form.is_valid():
                 form.save()
@@ -61,8 +58,9 @@ def show_playground_page(request):
 
     entry_subentries = {}
     for entry in entries:
-        subentries = entry.subentry_set.all()
+        subentries = entry.subentry_set.all() 
         entry_subentries[entry.id] = subentries
+
     balance_sheet = get_and_analyze_balance_sheet(business_id=playground_id)
     context = {
         "form": form,
@@ -80,12 +78,12 @@ def show_concepts_page(request):
 
 def show_entries(request, business_id):
     try:
-        entries = get_data_utils.get_entries(business_id)
+        entries = get_entries(business_id)
     except JournalEntry.DoesNotExist: 
         raise Http404("No entries")
     return render(request, "accounting/playground.html", {"entries": entries})
     
-def generate_financial_statement(request, business_id): 
+def generate_financial_statement(request): 
     return render(request, "accounting/playground.html")
 
 """
@@ -96,21 +94,17 @@ def add_entry(form: JournalEntryForm, user):
         journal_entry = form.save(commit=False)
         journal_entry.user = user
         journal_entry.save()
-        print(f"User with ID {user.username} added new entry")
         
         print(type(JournalEntry.objects.filter(user_id=2).first()))
         subentries = SubEntries(journal_entry=journal_entry)
         subentries.analyze()
         subentries.save_to_db()
-        print(f"Subentries added for JournalEntry ID {journal_entry.id}")
     else:
-        print("Form is not valid")
         print(form.errors)
 
 def delete_entry(entry_id, user):
         entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
         entry.delete()
-        print(f"Entry {entry_id} deleted")
 
 def get_and_analyze_balance_sheet(business_id) -> BalanceSheet: 
     balance_sheet = BalanceSheet(business_id=business_id, date="07-30-2024")

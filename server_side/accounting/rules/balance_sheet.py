@@ -84,29 +84,39 @@ class BalanceSheet():
 
     def generate(self):
         sub_entries = SubEntry.objects.filter(user_id=self.business_id)
-        assert sub_entries is not None, "Is empty"
+        assert sub_entries is not None, "Is empty" # Delete later
 
         for subentry in sub_entries:
             isDebit = subentry.sub_entry_type == "Debit"
             account = subentry.account
-
+    
+            """
+            The only way for a subentry to be recognized by the balance sheet is through the mapping
+            """
             if account in self.account_to_balance_sheet_mapping:
-
+                """ 
+                If account is in group of Asset or Liabilities, it the mapping would have length of 3 (section, group, item)
+                """
                 if len(self.account_to_balance_sheet_mapping[account]) == 3:
                     section, group, item = self.account_to_balance_sheet_mapping[account]
                 else: # Equities just section and items, no group
                     section, group, item = (self.account_to_balance_sheet_mapping[account][0], None, self.account_to_balance_sheet_mapping[account][1]) 
 
-                isEquities = group == None
+                isAsset = (section == "Assets")
+                isLiabilities = (section == "Liabilities")
+                isEquities = (section == "Equities")
+
+                """
+                A = L + E
+                Left side increase with a debit
+                Right side increase with a credit
+                """
+                if isAsset:
+                    self.balance_sheet[section][group][item] += subentry.amount if isDebit else ((-1)*subentry.amount)
+                
+                if isLiabilities:
+                    self.balance_sheet[section][group][item] += ((-1)*subentry.amount if isDebit else subentry.amount)
 
                 if isEquities:
-                    if isDebit:
-                        self.balance_sheet[section][item] += subentry.amount
-                    else:
-                        self.balance_sheet[section][item] -= subentry.amount
-                else:
-                    if isDebit:
-                        self.balance_sheet[section][group][item] += subentry.amount if isDebit else ((-1) * subentry.amount)
-                    else:
-                        self.balance_sheet[section][group][item] -= subentry.amount
+                    self.balance_sheet[section][item] += ((-1)*subentry.amount if isDebit else subentry.amount)
 
