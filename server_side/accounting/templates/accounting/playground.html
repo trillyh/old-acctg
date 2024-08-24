@@ -18,9 +18,9 @@
                 </tr>
             </thead>
             <tbody>
-
+        
                 <!-- Add new journal entry, if no form is currently in "editing mode" -->
-                {% if not form.instance.id %}
+                {% if not editing_entry %}
                 <tr>
                     <form method="post" action="{% url 'playground' %}">
                         {% csrf_token %}
@@ -32,20 +32,18 @@
                         </td>
                     </form>
                 </tr>
-                {% endif %}
-
+ │   17 """               {% endif %}
+        
                 <!-- Show all entries as rows -->
                 {% for entry in entries %}
                 <tr>
                     <!-- Editing mode-->
-                    {% if form.instance.id == entry.id %}
+                    {% if editing_entry and editing_entry.id == entry.id %}
                     <form method="post" action="{% url 'playground' %}">
                         {% csrf_token %}
                         <input type="hidden" name="entry_id" value="{{ entry.id }}">
                             {% for field in form %}
-                        <td>
-                            {{ field }}
-                        </td>
+                            <td>{{ field }}</td>
                             {% endfor %}
                         <td>
                             <button class="save-entry-button" type="submit" name="save">Save</button>
@@ -79,10 +77,11 @@
                     </td>
                 </tr>
                 {% endfor %}
-
+        
             </tbody>
         </table>
         {% endif %}
+        
     </div>
 
     <div class="playground-financial-statement"> 

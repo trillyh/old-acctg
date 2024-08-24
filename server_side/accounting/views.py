@@ -23,22 +23,35 @@ def show_playground_page(request):
     playground_id = 2
     curr_user = get_object_or_404(User, id=playground_id)
 
+    editing_entry = None  # Entry being editied, none by default
+
     form = JournalEntryForm()
     if request.method == 'POST':
         if 'add' in request.POST:
             form = JournalEntryForm(request.POST)
-            handle_add_entry_form(form, curr_user)
+            add_entry(form, curr_user)
             return redirect(show_playground_page)
 
         elif 'delete' in request.POST:
             entry_id = request.POST.get("entry_id") 
-            handle_delete_entry_form(entry_id, curr_user)
+            delete_entry(entry_id, curr_user)
             return redirect(show_playground_page)
 
         elif 'edit' in request.POST:
             print(request.POST.dict())
-            pk = request.POST.get('entry_id')
-            form = handle_edit_entry_form(pk)
+            entry_id = request.POST.get('entry_id')
+            editing_entry = get_object_or_404(JournalEntry, id=entry_id)
+            form = JournalEntryForm(instance=editing_entry)
+
+        elif 'save' in request.POST:
+            entry_id = request.POST.get('entry_id') 
+            editing_entry = get_object_or_404(JournalEntry, id=entry_id)
+            print(f"form received {request.POST}")
+            print(f"The editing entry is {editing_entry}")
+            form = JournalEntryForm(request.POST, instance=editing_entry)
+            if form.is_valid():
+                form.save()
+                return redirect(show_playground_page)
 
     entries = None
     try:
@@ -56,10 +69,11 @@ def show_playground_page(request):
         "entries": entries,
         "entry_subentries": entry_subentries,
         "user": curr_user,
-        "balance_sheet": balance_sheet
+        "balance_sheet": balance_sheet,
+        "editing_entry": editing_entry
     } 
-    print(entry_subentries)
     return render(request, "accounting/playground.html", context) 
+
 
 def show_concepts_page(request):
     return render(request, "accounting/concepts.html")
@@ -77,7 +91,7 @@ def generate_financial_statement(request, business_id):
 """
 ------------- Helper functions -------------
 """
-def handle_add_entry_form(form: JournalEntryForm, user):
+def add_entry(form: JournalEntryForm, user):
     if form.is_valid():
         journal_entry = form.save(commit=False)
         journal_entry.user = user
@@ -93,14 +107,10 @@ def handle_add_entry_form(form: JournalEntryForm, user):
         print("Form is not valid")
         print(form.errors)
 
-def handle_delete_entry_form(entry_id, user):
+def delete_entry(entry_id, user):
         entry = get_object_or_404(JournalEntry, id=entry_id, user=user)
         entry.delete()
         print(f"Entry {entry_id} deleted")
-
-def handle_edit_entry_form(entry_id: int):
-    entry = JournalEntry.objects.get(id = entry_id)
-    return JournalEntryForm(instance=entry) 
 
 def get_and_analyze_balance_sheet(business_id) -> BalanceSheet: 
     balance_sheet = BalanceSheet(business_id=business_id, date="07-30-2024")
