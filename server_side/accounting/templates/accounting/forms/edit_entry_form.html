@@ -1,0 +1,10 @@
+<form method="post" action="{% url 'playground' %}">
+	{% csrf_token %}
+	<input type="hidden" name="entry_id" value="{{ entry.id }}">
+	{% for field in form %}
+	<td>{{ field }}</td>
+	{% endfor %}
+	<td>
+		<button class="save-entry-button" type="submit" name="save">Save</button>
+	</td>
+</form>

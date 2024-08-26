@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'playground' %}" style="display:inline;">
+	{% csrf_token %}
+	<input type="hidden" name="entry_id" value="{{ entry.id }}">
+	<button class="edit-button" type="submit" name="edit">Edit</button>
+</form>

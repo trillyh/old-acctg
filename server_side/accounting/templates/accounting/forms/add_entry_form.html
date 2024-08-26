@@ -1,0 +1,11 @@
+<form method="post" action="{% url 'playground' %}">
+	{% csrf_token %}
+
+	{% for field in form %}
+	<td>{{ field }}</td>
+	{% endfor %}
+
+	<td>
+		<button class="add-entry-button" type="submit" name="add">Add entry</button>
+	</td>
+</form>

@@ -1,0 +1,5 @@
+<form method="post" If not in editing mode, just show entry date and description, button for edit and deleteaction="{% url 'playground' %}" style="display:inline;">
+	{% csrf_token %}
+	<input type="hidden" name="entry_id" value="{{ entry.id }}">
+	<button class="delete-button" type="submit" name="delete">Delete</button>
+</form>

@@ -22,15 +22,7 @@
 				<!-- Add new journal entry, if no form is currently in "editing mode" -->
 				{% if not editing_entry %}
 				<tr>
-					<form method="post" action="{% url 'playground' %}">
-						{% csrf_token %}
-						{% for field in form %}
-						<td>{{ field }}</td>
-						{% endfor %}
-						<td>
-							<button class="add-entry-button" type="submit" name="add">Add entry</button>
-						</td>
-					</form>
+					{% include 'accounting/forms/add_entry_form.html'%}
 				</tr>
 				{% endif %}
 
@@ -39,35 +31,21 @@
 				<tr>
 					<!-- Editing mode-->
 					{% if editing_entry and editing_entry.id == entry.id %}
-					<form method="post" action="{% url 'playground' %}">
-						{% csrf_token %}
-						<input type="hidden" name="entry_id" value="{{ entry.id }}">
-						{% for field in form %}
-						<td>{{ field }}</td>
-						{% endfor %}
-						<td>
-							<button class="save-entry-button" type="submit" name="save">Save</button>
-						</td>
-					</form>
+						{% include 'accounting/forms/edit_entry_form.html'%}
+
 					{% else %}
 					<!-- If not in editing mode, just show entry date and description, button for edit and delete -->
 					<td>{{ entry.entry_date }}</td>
 					<td>{{ entry.description }}</td>
+
 					<td>
-						<form method="post" If not in editing mode, just show entry date and description, button for edit and deleteaction="{% url 'playground' %}" style="display:inline;">
-							{% csrf_token %}
-							<input type="hidden" name="entry_id" value="{{ entry.id }}">
-							<button class="delete-button" type="submit" name="delete">Delete</button>
-						</form>
-						<form method="post" action="{% url 'playground' %}" style="display:inline;">
-							{% csrf_token %}
-							<input type="hidden" name="entry_id" value="{{ entry.id }}">
-							<button class="edit-button" type="submit" name="edit">Edit</button>
-						</form>
+						{% include 'accounting/forms/delete_entry_form.html'%}
+						{% include 'accounting/forms/edit_button.html'%}
 					</td>
+
 					{% endif %}
 				</tr>
-				<tr>
+
 				<!--
 				1. Let's have subentries beneath the entry, smaller text,
 				debit -> account option -> amount
@@ -75,13 +53,15 @@
 				can change it, then save.
 				A warning beneath the entry and subentries when Debit != Credit
 				-->
-								<td colspan="0">
+				<tr>
+					<td colspan="0">
 						{% with subentries=entry_subentries|get_item:entry.id %}
 						{% for subentry in subentries %}
-						<p>{{ subentry }}</p> 
+						<p class="subentry">{{ subentry }}</p> 
 						{% endfor %}
 						{% endwith %}
 					</td>
+
 				<tr>
 					<form method="post" action="{% url 'playground' %}">
 						{% csrf_token %}
