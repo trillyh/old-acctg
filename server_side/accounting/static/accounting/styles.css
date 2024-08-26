@@ -220,3 +220,47 @@ button:hover {
     background-color: #c9302c;
 }
 
+
+
+.entry-description {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.subentries {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    color: #555;
+    padding-left: 10px;
+}
+
+.subentry {
+    margin: 2px 0;
+    padding: 2px 5px;
+    background-color: #f7f7f7;
+    border-left: 3px solid #ddd;
+    border-radius: 2px;
+    display: block;
+}
+
+.subentry:hover {
+    background-color: #eaeaea;
+}
+
+
+.editing-mode,
+.editing-mode td,
+.editing-mode .entry-description,
+.editing-mode .subentries,
+.editing-mode .subentry {
+    background-color: #e0f7fa !important; 
+    transition: background-color 0.3s ease; 
+}
+
+.editing-mode .subentry {
+    border-left-color: #0097a7; 
+}rder-left-color: #0097a7;
+}
+

@@ -1,0 +1,11 @@
+<td>Subentries</td>
+<td colspan="3">
+	<form method="post" action="{% url 'playground' %}">
+		{% csrf_token %}
+		{% for field in edit_subentry_form %}
+		{{ field }}
+		{% endfor %}
+		<button class="save-entry-button" type="submit" name="save-subentry">Save</button>
+	</form>
+</td>
+

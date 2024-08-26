@@ -1,91 +1,74 @@
-
 {% extends 'accounting/index.html' %}
 {% load dict_tags %}
-	{% block content %}
+{% block content %}
 
 <div class="content">
-	<h1>Accounting Playground</h1>
-	<p>Use this playground to experiment with accounting rules and concepts without logging in.</p>
+    <h1>Accounting Playground</h1>
+    <p>Use this playground to experiment with accounting rules and concepts without logging in.</p>
 
-	<div class="playground-entries"> 
-		{% if entries %}
-		<table class="entries-table">
-			<thead>
-				<tr>
-					<th>Date</th>
-					<th>Description</th>
-					<th>Action</th>
-				</tr>
-			</thead>
-			<tbody>
+    <div class="playground-entries"> 
+        {% if entries %}
+        <table class="entries-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
 
-				<!-- Add new journal entry, if no form is currently in "editing mode" -->
-				{% if not editing_entry %}
-				<tr>
-					{% include 'accounting/forms/add_entry_form.html'%}
-				</tr>
-				{% endif %}
+                <!-- Add new journal entry, if no form is currently in "editing mode" -->
+                {% if not editing_entry %}
+                <tr>
+                    {% include 'accounting/forms/add_entry_form.html' %}
+                </tr>
+                {% endif %}
 
-				<!-- Show all entries as rows -->
-				{% for entry in entries %}
-				<tr>
-					<!-- Editing mode-->
-					{% if editing_entry and editing_entry.id == entry.id %}
-						{% include 'accounting/forms/edit_entry_form.html'%}
+                <!-- Show all entries as rows -->
+                {% for entry in entries %}
+                <tr class="{% if editing_entry and editing_entry.id == entry.id %}editing-mode{% endif %}">
+                    {% if editing_entry and editing_entry.id == entry.id %}
+                        <!-- Editing mode -->
+                        {% include 'accounting/forms/edit_entry_form.html' %}
+                    {% else %}
+                        <!-- If not in editing mode, just show entry date and description, button for edit and delete -->
+                        <td>{{ entry.entry_date }}</td>
+                        <td>
+                            <p class="entry-description">{{ entry.description }}</p>
+                            {% with subentries=entry_subentries|get_item:entry.id %}
+                            <div class="subentries">
+                                {% for subentry in subentries %}
+                                    <p class="subentry">{{ subentry }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+                        </td>
+                        <td>
+                            {% include 'accounting/forms/delete_entry_form.html' %}
+                            {% include 'accounting/forms/edit_button.html' %}
+                        </td>
+                    {% endif %}
+                </tr>
 
-					{% else %}
-					<!-- If not in editing mode, just show entry date and description, button for edit and delete -->
-					<td>{{ entry.entry_date }}</td>
-					<td>{{ entry.description }}</td>
+                <!-- Subentry editing form, shown only when in editing mode -->
+                {% if editing_entry and editing_entry.id == entry.id %}
+                <tr class="editing-mode">
+                    {% include 'accounting/forms/edit_subentries_form.html' %}
+                </tr>
+                {% endif %}
+                {% endfor %}
 
-					<td>
-						{% include 'accounting/forms/delete_entry_form.html'%}
-						{% include 'accounting/forms/edit_button.html'%}
-					</td>
+            </tbody>
+        </table>
+        {% endif %}
 
-					{% endif %}
-				</tr>
+    </div>
 
-				<!--
-				1. Let's have subentries beneath the entry, smaller text,
-				debit -> account option -> amount
-				credit -> account option -> amount
-				can change it, then save.
-				A warning beneath the entry and subentries when Debit != Credit
-				-->
-				<tr>
-					<td colspan="0">
-						{% with subentries=entry_subentries|get_item:entry.id %}
-						{% for subentry in subentries %}
-						<p class="subentry">{{ subentry }}</p> 
-						{% endfor %}
-						{% endwith %}
-					</td>
-
-				<tr>
-					<form method="post" action="{% url 'playground' %}">
-						{% csrf_token %}
-						{% for field in edit_subentry_form %}
-						<td>{{ field }}</td>
-						{% endfor %}
-						<td>
-							<button class="save-entry-button" type="submit" name="save-subentry">Save</button>
-						</td>
-					</form>
-				</tr>
-				{% endfor %}
-
-			</tbody>
-		</table>
-		{% endif %}
-
-	</div>
-
-	<div class="playground-financial-statement"> 
-		{%include 'accounting/financial_statement.html'%}
-	</div>
+    <div class="playground-financial-statement">
+        {% include 'accounting/financial_statement.html' %}
+    </div>
 </div>
 
 {% endblock content %}
-
 
