@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from .models import JournalEntry
 from .models import SubEntry
-from .forms import JournalEntryForm
+from .forms import JournalEntryForm, SubEntryEditingForm
 from .rules.subentries import SubEntries
 from .rules.balance_sheet import BalanceSheet
 
@@ -26,6 +26,8 @@ def show_playground_page(request):
     editing_entry = None  # Entry being editied, none by default
 
     form = JournalEntryForm()
+
+    subentry_editing_form = SubEntryEditingForm()
     if request.method == 'POST':
         if 'add' in request.POST:
             form = JournalEntryForm(request.POST)
@@ -62,8 +64,10 @@ def show_playground_page(request):
         entry_subentries[entry.id] = subentries
 
     balance_sheet = get_and_analyze_balance_sheet(business_id=playground_id)
+    
     context = {
         "form": form,
+        "edit_subentry_form": subentry_editing_form,
         "entries": entries,
         "entry_subentries": entry_subentries,
         "user": curr_user,
